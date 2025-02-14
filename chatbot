@@ -1,0 +1,52 @@
+import os
+import google.generativeai as genai
+from google.generativeai import ChatSession
+from elevenlabs import play
+from elevenlabs.client import ElevenLabs
+
+
+
+#API
+os.environ["GOOGLE_API_KEY"] = "AIzaSyBy6aZhOvkflDqa8gOKVB8fYpb_eXa5eBE"
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+
+os.environ["ELEVEN_API_KEY"] = "sk_d3a8e7a9160b943467e55bd1887a7e8fd7406a6ba9471824"
+client = ElevenLabs(
+    api_key=os.environ["ELEVEN_API_KEY"]
+)
+
+#basic config
+generation_config = {
+  "temperature": 1,
+  "top_p": 0.95,
+  "top_k": 40,
+  "max_output_tokens": 8192,
+  "response_mime_type": "text/plain",
+}
+
+model = genai.GenerativeModel(
+  model_name="gemini-1.5-flash",
+  generation_config=generation_config,
+)
+
+def speak(audio):
+    audio = client.text_to_speech.convert(
+        text=audio,
+        voice_id="JBFqnCBsd6RMkjVDRZzb",
+        model_id="eleven_multilingual_v2",
+        output_format="mp3_44100_128",
+    )
+    play(audio)
+
+chat_session = ChatSession(model=model)
+while True:
+    user=input("You: ")
+    if user.lower() == "bye":
+        break
+
+    response = chat_session.send_message(user)
+    print(response.text)
+    speak(response.text)
+
+
+
