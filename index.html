@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Location</title>
+</head>
+<body>
+    <h3>Live Location Tracking</h3>
+    <script>
+        window.onload = function() {
+            getLocation();
+        };
+    </script>
+    <p id="output"></p>
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(function(position) {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+
+                    document.getElementById("output").innerText = `Latitude: ${lat}, Longitude: ${lon}`;
+
+                    fetch("http://127.0.0.1:5000/update-location", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ latitude: lat, longitude: lon })
+                    });
+                });
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+    </script>
+</body>
+</html>
